@@ -109,6 +109,7 @@ def train(model: torch.nn.Module,
           epochs: int,
           patience: int=None,
           device: torch.device=DEVICE,
+          verbose:bool=True,
           show_plots: bool=False) -> dict[str, list]:
     """
     Trains and tests a PyTorch model.
@@ -121,6 +122,7 @@ def train(model: torch.nn.Module,
         loss_fn: Loss function for calculating loss.
         epochs: Number of training epochs.
         device: Device for computation. Default is "cuda".
+        verbose: Showing average train/test loss per epoch. Default is True
         show_plots: Whether to show loss plots. Default is False.
 
         
@@ -159,13 +161,14 @@ def train(model: torch.nn.Module,
             device=device
         )
 
-        # Print out what's happening
-        if ((epoch +1) % 10 == 0 or epoch == 0):
-            print(
-                f"Epoch: {epoch+1} | "
-                f"train_loss: {train_loss:.4f} | "
-                f"test_loss: {test_loss:.4f} | "
-            )
+        if verbose:
+            # Print out what's happening
+            if ((epoch +1) % 10 == 0 or epoch == 0):
+                print(
+                    f"Epoch: {epoch+1} | "
+                    f"train_loss: {train_loss:.4f} | "
+                    f"test_loss: {test_loss:.4f} | "
+                )
 
         # Update results dictionary
         results["train_loss"].append(train_loss)
@@ -180,7 +183,8 @@ def train(model: torch.nn.Module,
                 early_stop_counter += 1
 
             if early_stop_counter >= patience:
-                print(f"Early stopping: No improvement in {patience} epochs.")
+                if verbose:
+                    print(f"Early stopping: No improvement in {patience} epochs.")
                 last_epoch = epoch
                 break
 
